@@ -5,6 +5,8 @@ author: Milan Musil
 email: musil.e@seznam.cz
 """
 
+import re
+
 TEXTS = [
     '''Situated about 10 miles west of Kemmerer,
     Fossil Butte is a ruggedly impressive
@@ -47,7 +49,7 @@ login = {"bob": "123", "ann": "pass123", "mike": "password123", "liz": "pass123"
 username = input("username: ")
 password = input("password: ")
 
-if login[username] == password:
+if login.get(username) == password:
     print("-" * 40)
     print("Welcome to the app,", username)
     print("We have 3 texts to be analyzed.")
@@ -68,61 +70,30 @@ if login[username] == password:
         exit()
     #if the conditions are met, process the text
     else:
-        text = (TEXTS[int(number) - 1].replace("\n","").replace(",","").replace(".","").split(" "))
+        #processing input text using first 4 lessons, failed on first project submission
+        #text = (TEXTS[int(number) - 1].replace("\n","").replace(",","").replace(".","").split(" "))
+        
+        #recommended use of regular expressions
+        #text = re.sub(r'\.\,\n','', TEXTS[int(number) - 1]).split(' ')
+        text = TEXTS[int(number) - 1]
+        text = re.sub(r"\s+", " ", text)
+        text = text.strip()
+        regex = re.compile(r"[^a-zA-Z0-9 ]+")
+        textWithoutSpecChar = regex.sub("", text)
+        text = re.split(r"\s+", textWithoutSpecChar)
+
+        print("-" * 40)
+        
+        lenWord = dict()
         countOfWords = 0
         countOfWordsFrstUpp = 0
         countOfWordsUpp = 0
         countOfWordsLow = 0
         countOfNumbers = 0
         sumOfNumbers = 0
-        numberChar1 = 0
-        numberChar2 = 0
-        numberChar3 = 0
-        numberChar4 = 0
-        numberChar5 = 0
-        numberChar6 = 0
-        numberChar7 = 0
-        numberChar8 = 0
-        numberChar9 = 0
-        numberChar10 = 0
-        numberChar11 = 0
-        numberChar12 = 0
-        numberChar13 = 0
-        numberChar14 = 0
-        numberChar15 = 0
         for word in text:
-            if not word == '':
-                if len(word) == 1:
-                    numberChar1 = numberChar1 +1
-                if len(word) == 2:
-                    numberChar2 = numberChar2 +1
-                if len(word) == 3:
-                    numberChar3 = numberChar3 +1
-                if len(word) == 4:
-                    numberChar4 = numberChar4 +1
-                if len(word) == 5:
-                    numberChar5 = numberChar5 +1
-                if len(word) == 6:
-                    numberChar6 = numberChar6 +1
-                if len(word) == 7:
-                    numberChar7 = numberChar7 +1
-                if len(word) == 8:
-                    numberChar8 = numberChar8 +1
-                if len(word) == 9:
-                    numberChar9 = numberChar9 +1
-                if len(word) == 10:
-                    numberChar10 = numberChar10 +1
-                if len(word) == 11:
-                    numberChar11 = numberChar11 +1
-                if len(word) == 12:
-                    numberChar12 = numberChar12 +1
-                if len(word) == 13:
-                    numberChar13 = numberChar13 +1
-                if len(word) == 14:
-                    numberChar14 = numberChar14 +1
-                if len(word) == 15:
-                    numberChar15 = numberChar15 +1
-                
+            if len(word) > 0:
+                lenWord[len(word)] = lenWord.get(len(word),0) + 1 
                 countOfWords = countOfWords + 1
                 if word.isnumeric():
                     countOfNumbers = countOfNumbers + 1
@@ -134,31 +105,28 @@ if login[username] == password:
                 elif word == word.lower():
                     countOfWordsLow = countOfWordsLow + 1
 
-        print("-" * 40)
         print("There are", countOfWords, "words in the selected text.")
         print("There are", countOfWordsFrstUpp, "titlecase words.")
         print("There are", countOfWordsUpp, "uppercase words.")
         print("There are", countOfWordsLow, "lowercase words.")
         print("There are", countOfNumbers, "numeric strings.")
         print("The sum of all the numbers", sumOfNumbers)
+        
         print("-" * 40)
         print("LEN|  OCCURENCES  |NR.")
         print("-" * 40)
-        print(" 1 |", "*" * numberChar1, numberChar1)
-        print(" 2 |", "*" * numberChar2, numberChar2)
-        print(" 3 |", "*" * numberChar3, numberChar3)
-        print(" 4 |", "*" * numberChar4, numberChar4)
-        print(" 5 |", "*" * numberChar5, numberChar5)
-        print(" 6 |", "*" * numberChar6, numberChar6)
-        print(" 7 |", "*" * numberChar7, numberChar7)
-        print(" 8 |", "*" * numberChar8, numberChar8)
-        print(" 9 |", "*" * numberChar9, numberChar9)
-        print("10 |", "*" * numberChar10, numberChar10)
-        print("11 |", "*" * numberChar11, numberChar11)
-        print("12 |", "*" * numberChar12, numberChar12)
-        print("13 |", "*" * numberChar13, numberChar13)
-        print("14 |", "*" * numberChar14, numberChar14)
-        print("15 |", "*" * numberChar15, numberChar15)
+        
+        for numberOfChar in range(1,countOfWords+1):
+            valueNumberOfChar = lenWord.get(numberOfChar, 0)
+            if numberOfChar < 10:
+                print("", numberOfChar, "|", "*" * valueNumberOfChar, valueNumberOfChar)
+            else:
+                print(numberOfChar, "|", "*" * valueNumberOfChar, valueNumberOfChar)
+            if lenWord.get(numberOfChar) != None:
+                lenWord.pop(numberOfChar)
+            if len(lenWord) == 0:
+                break
+        
 else:
     print("username:", username)
     print("password:", password)
